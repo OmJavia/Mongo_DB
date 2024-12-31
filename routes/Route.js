@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {User} = require('../model/Path'); 
+const {User, Product} = require('../model/Path'); 
 const { Signup } = require('../controller/auth.controller');
 
 
@@ -10,7 +10,21 @@ router.post('/signup',Signup );
 // Route to get record of all the users(Find)
 router.get('/find', async (req, res) => {
     try {
-        let data = await User.find({}); // Use the correct model
+        let data = await User.aggregate([
+            {
+                $match: {age: {$gt: 25}}
+            },
+            {       // 1 for ascending and -1 for descending
+                $sort: {age: -1}
+            },
+            {
+                $project: {_id:0,name:1,age:1}
+            }
+            // {
+            //     $count: 'total'
+            // }
+
+        ]); // Use the correct model
         return res.status(200).json({
             data: data,
         });
@@ -314,6 +328,33 @@ router.post('/insertextra', async (req, res) => {
         });
     }
 });
+
+
+
+// Find the user by ID and Adding new Address
+router.post('/findbyidandadd', async (req, res) => {
+    try {
+        const {newAddress} = req.body;
+
+        let data = await User.updateOne(
+            { _id:"6773a2d9f2c4974a9caf9668"},
+             {$push: {address: newAddress }}
+            );
+
+        return res.status(200).json({
+            data: data,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            error: err.message,
+        });
+}
+});
+
+
+
+
 
 
 module.exports = router;

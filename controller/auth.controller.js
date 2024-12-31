@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 // Signup a new user
 async function Signup(req, res) {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, age, address } = req.body;
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -20,6 +20,8 @@ async function Signup(req, res) {
             name: name,
             email: email,
             password: hashedPassword,
+            age: age,
+            address: address,
         });
 
         // Return the saved user
